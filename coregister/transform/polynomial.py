@@ -112,7 +112,7 @@ class PolynomialModel():
 
         """
         k = self.kernel(src)
-        dst = np.vstack([k.dot(p) for p in self.parameters.T]).T
+        dst = np.einsum("ij,jk", k, self.parameters)
         return dst
 
     def estimate(self, src, dst, weights_vec=None, wts=None):
