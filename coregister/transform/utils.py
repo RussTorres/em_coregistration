@@ -1,8 +1,9 @@
 import scipy
+import numpy
 import numpy as np
 
 
-def solve(A, w, r, x0, dst):
+def solve(A, w, r, x0, dst, check_finite=False):
     """regularized linear least squares
 
     Parameters
@@ -27,14 +28,16 @@ def solve(A, w, r, x0, dst):
         nparameter x 3 solution
 
     """
-    ATW = A.transpose().dot(w)
-    K = ATW.dot(A) + np.eye(r.size) * r
-    lu, piv = scipy.linalg.lu_factor(K, overwrite_a=True)
-    x = np.zeros((A.shape[1], dst.shape[1]))
-    for i in range(dst.shape[1]):
-        rhs = r.dot(x0[:, i]) + ATW.dot(dst[:, i])
-        x[:, i] = scipy.linalg.lu_solve(
-                (lu, piv), rhs)
+    ATW = A.T.dot(w)
+    K = ATW.dot(A) + numpy.diag(r)
+    lu, piv = scipy.linalg.lu_factor(
+        K, overwrite_a=True, check_finite=check_finite)
+    rhs_arr = (
+        numpy.einsum("i,ij", r, x0)[:, None] +
+        numpy.einsum("ij,jk->ki", ATW, dst))
+    x = scipy.linalg.lu_solve(
+        (lu, piv), rhs_arr.T,
+        overwrite_b=True, check_finite=check_finite)
     return x
 
 
