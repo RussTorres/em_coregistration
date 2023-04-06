@@ -60,8 +60,8 @@ class TransformList():
     def from_dict(self, json):
         self.transforms = [Transform(json=j) for j in json['transforms']]
 
-    def estimate(self, src, dst):
+    def estimate(self, src, dst, weights_vec=None):
         nsrc = np.copy(src)
         for tf in self.transforms:
-            tf.estimate(nsrc, dst)
+            tf.estimate(nsrc, dst, weights_vec)
             nsrc = tf.tform(nsrc)

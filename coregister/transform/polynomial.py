@@ -1,6 +1,7 @@
 import numpy as np
 import itertools
-from . utils import solve
+from . utils import solve, initialize_weights_vec
+
 
 
 class PolynomialModel():
@@ -114,9 +115,15 @@ class PolynomialModel():
         dst = np.vstack([k.dot(p) for p in self.parameters.T]).T
         return dst
 
-    def estimate(self, src, dst, wts=None):
-        if wts is None:
-            wts = np.eye(src.shape[0])
+    def estimate(self, src, dst, weights_vec=None, wts=None):
+        if weights_vec is None:
+            # legacy weights behavior
+            if wts is None:
+                wts = np.eye(src.shape[0])
+        else:
+            weights_vec = initialize_weights_vec(weights_vec, src)
+            wts = np.diag(weights_vec)
+
         self.parameters = solve(
                 self.kernel(src),
                 wts,

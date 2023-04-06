@@ -36,3 +36,11 @@ def solve(A, w, r, x0, dst):
         x[:, i] = scipy.linalg.lu_solve(
                 (lu, piv), rhs)
     return x
+
+
+def initialize_weights_vec(weights_vec, example_pts):
+    if isinstance(weights_vec, np.ndarray):
+        return weights_vec
+    if weights_vec is None:
+        return np.ones(example_pts.shape[0], dtype=np.float64)
+    return np.array(weights_vec, dtype=np.float64)

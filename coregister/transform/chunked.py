@@ -1,4 +1,6 @@
 import numpy as np
+
+from .utils import initialize_weights_vec
 from . polynomial import PolynomialModel
 
 
@@ -80,10 +82,13 @@ class ChunkedModel():
             dst[inds, :] = self.transforms[i].tform(src[inds, :])
         return dst
 
-    def estimate(self, src, dst):
+    def estimate(self, src, dst, weights_vec=None):
+        weights_vec = initialize_weights_vec(weights_vec, src)
         if not hasattr(self, 'ranges'):
             self.set_ranges_from_src(src, self.axis, self.nchunks)
         which = np.searchsorted(self.ranges, src[:, self.axis])
         for i in range(self.nchunks):
             inds = which == i
-            self.transforms[i].estimate(src[inds, :], dst[inds, :])
+            self.transforms[i].estimate(
+                src[inds, :], dst[inds, :],
+                weights_vec=weights_vec[inds])
