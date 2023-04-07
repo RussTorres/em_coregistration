@@ -6,13 +6,13 @@ import numpy
 import coregister.transform.transform
 
 
-def leave_one_out_fitting(transform_dict, src_pts, dst_pts):
+def leave_one_out_fitting(transform_dict, src_pts, dst_pts, weights_vec=None):
     # copy may not be necessary
     tform_dict = copy.deepcopy(transform_dict)
 
-    def fit_transform(src, dst):
+    def fit_transform(src, dst, weights_vec=None):
         tform = coregister.transform.Transform(json=tform_dict)
-        tform.estimate(src, dst)
+        tform.estimate(src, dst, weights_vec=weights_vec)
         return tform
 
     predicted_dsts = numpy.empty_like(dst_pts)
@@ -23,8 +23,13 @@ def leave_one_out_fitting(transform_dict, src_pts, dst_pts):
 
         masked_src_pts = src_pts[~pts_mask]
         masked_dst_pts = dst_pts[~pts_mask]
+        masked_weights_vec = (
+            None if weights_vec is None
+            else weights_vec[~pts_mask]
+        )
 
-        l1out_tform = fit_transform(masked_src_pts, masked_dst_pts)
+        l1out_tform = fit_transform(masked_src_pts, masked_dst_pts,
+                                    weights_vec=masked_weights_vec)
 
         l1out_src_pts = numpy.array([src_pts[l1out_idx]])
 
