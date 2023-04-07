@@ -79,3 +79,9 @@ def minimum_axial_lengths_polygon(s):
     a1 = numpy.linalg.norm(edge_arr[0] - edge_arr[3])
     a0 = numpy.linalg.norm(edge_arr[0] - edge_arr[1])
     return sorted((a1, a0), reverse=True)
+
+
+def center_point_from_roi_info(roi_info, **kwargs):
+    return numpy.array(
+        center_from_pix_mask(roi_info.pix_mask, **kwargs).tolist() +
+        [roi_info.plane_z])
