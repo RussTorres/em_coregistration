@@ -1,11 +1,13 @@
 # read and write files for manual coregistration
+import csv
+
 import numpy
 import pandas
 
 
 def read_landmarks_from_coreg_csv(csv_fn, column_names, src_prefix, dst_prefix,
-                                  column_bool_filters=[],
-                                  additional_return_columns=[]):
+                                  column_bool_filters=tuple(),
+                                  additional_return_columns=tuple()):
     # TODO separate out pandas read to allow easier manipulation
     df = pandas.read_csv(
             csv_fn,
@@ -62,4 +64,5 @@ def _format_df(df):
 
 def write_landmarks_to_coreg_csv(csv_fn, *args, **kwargs):
     df = write_landmarks_to_coreg_df(*args, **kwargs)    
-    _format_df(df).to_csv(csv_fn, index=False, header=False)
+    _format_df(df).to_csv(
+        csv_fn, index=False, header=False, quoting=csv.QUOTE_ALL)
